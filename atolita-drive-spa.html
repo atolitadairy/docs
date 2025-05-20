@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atolita: Google Drive Organization Plan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Visualization & Content Choices:
+        - Core Principles: Presented as a styled list for easy readability. Goal: Inform. Method: HTML list + Tailwind. Interaction: Static. Justification: Clear, concise presentation of foundational concepts.
+        - Shared Drive Structure: Interactive nested list/accordion. Clicking a drive reveals its Purpose, Access, and Sub-folders. Goal: Organize & Inform. Method: HTML + Tailwind + JS for interactivity. Interaction: Click to expand/collapse. Justification: Allows users to explore the detailed structure without being overwhelmed, focusing on one drive at a time.
+        - Canva Files: Text block integrated within relevant drive details or a dedicated note. Goal: Inform. Method: HTML + Tailwind. Interaction: Static.
+        - Access & Permissions: Descriptive text and styled cards/sections for roles. Goal: Inform. Method: HTML + Tailwind + JS for tabbed view if needed. Interaction: Static or tab selection. Justification: Clear explanation of permission levels.
+        - Workflow & Naming: Bulleted lists. Goal: Inform. Method: HTML + Tailwind. Interaction: Static.
+        - Implementation Steps: Ordered list, potentially with visual checkboxes. Goal: Inform/Organize. Method: HTML + Tailwind. Interaction: Static.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. All visual structure via HTML/Tailwind. No Chart.js/Plotly.js as data is primarily textual/hierarchical.
+        -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tab-active { 
+            border-bottom-color: #0D9488; /* teal-600 */
+            color: #0D9488; /* teal-600 */
+            font-weight: 600;
+        }
+        .tab-inactive {
+            border-bottom-color: transparent;
+        }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .drive-details { display: none; }
+        .drive-item:hover { background-color: #f0fdfa; /* teal-50 */ }
+        .details-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+        .access-viewer { background-color: #CCFBF1; color: #115E59; } /* teal-100, teal-800 */
+        .access-commenter { background-color: #A7F3D0; color: #065F46; } /* green-100, green-800 */
+        .access-contributor { background-color: #BAE6FD; color: #0C4A6E; } /* sky-100, sky-800 */
+        .access-content-manager { background-color: #DDD6FE; color: #5B21B6; } /* violet-100, violet-800 */
+        .access-manager { background-color: #FECDD3; color: #881337; } /* rose-100, rose-800 */
+        .access-restricted { background-color: #FEF08A; color: #713F12; } /* yellow-100, yellow-800 */
+        .access-custom { background-color: #E0E7FF; color: #3730A3; } /* indigo-100, indigo-800 */
+
+        .subfolder-list li {
+            padding-left: 1rem;
+            position: relative;
+        }
+        .subfolder-list li::before {
+            content: "📁";
+            position: absolute;
+            left: -0.5rem;
+            top: 0.125rem;
+            font-size: 0.8rem;
+        }
+        .implementation-step {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e5e7eb; /* gray-200 */
+        }
+        .implementation-step:last-child {
+            border-bottom: none;
+        }
+        .implementation-step .checkbox-icon {
+            margin-right: 0.75rem;
+            color: #0D9488; /* teal-600 */
+            font-size: 1.25rem;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-stone-100 text-stone-800">
+
+    <header class="bg-teal-700 text-white p-6 shadow-md">
+        <div class="container mx-auto max-w-6xl">
+            <h1 class="text-3xl font-bold">Atolita: Google Drive Organization Plan</h1>
+            <p class="text-teal-100">An interactive guide to structuring your digital workspace.</p>
+        </div>
+    </header>
+
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto max-w-6xl">
+            <ul class="flex">
+                <li><button data-tab="overview" class="tab-button text-sm sm:text-base py-3 px-3 sm:px-6 border-b-2 tab-active">Overview & Principles</button></li>
+                <li><button data-tab="structure" class="tab-button text-sm sm:text-base py-3 px-3 sm:px-6 border-b-2 tab-inactive">Shared Drive Structure</button></li>
+                <li><button data-tab="permissions" class="tab-button text-sm sm:text-base py-3 px-3 sm:px-6 border-b-2 tab-inactive">Permissions & Access</button></li>
+                <li><button data-tab="workflow" class="tab-button text-sm sm:text-base py-3 px-3 sm:px-6 border-b-2 tab-inactive">Workflow & Implementation</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container mx-auto max-w-6xl p-4 sm:p-6">
+        
+        <section id="overview" class="content-section active bg-white p-6 rounded-lg shadow">
+            <h2 class="text-2xl font-semibold text-teal-700 mb-4">Overview & Core Principles</h2>
+            <p class="mb-6 text-stone-700">This interactive guide translates Atolita's Google Drive organization plan into an easily digestible format. The primary goal is to help your team understand and implement a logical, secure, and efficient digital filing system. Navigate through the sections to explore the proposed structure, access strategies, and implementation steps.</p>
+            
+            <h3 class="text-xl font-semibold text-teal-600 mb-3">Core Principles for Google Drive Organization</h3>
+            <ul class="list-disc list-inside space-y-2 text-stone-700">
+                <li><strong>Centralization:</strong> Use Shared Drives for team-owned content as they are owned by the team, not an individual. This prevents data loss if an employee leaves.</li>
+                <li><strong>Logical Hierarchy:</strong> Create a clear, intuitive folder structure that mirrors your company's departments and projects.</li>
+                <li><strong>Granular Permissions:</strong> Apply the "principle of least privilege," giving users only the access they need to perform their tasks.</li>
+                <li><strong>Consistency:</strong> Maintain consistent naming conventions and structures across all drives and folders.</li>
+                <li><strong>Dedicated External Sharing:</strong> Create specific, controlled areas for sharing with external parties.</li>
+                <li><strong>Regular Review:</strong> Periodically review your structure and permissions to ensure they remain relevant and secure.</li>
+            </ul>
+        </section>
+
+        <section id="structure" class="content-section bg-white p-6 rounded-lg shadow">
+            <h2 class="text-2xl font-semibold text-teal-700 mb-4">Proposed Shared Drive & Folder Structure</h2>
+            <p class="mb-6 text-stone-700">This section details the recommended Shared Drive structure for Atolita. Click on each Shared Drive name to expand and view its purpose, access recommendations, and suggested sub-folders. This interactive approach helps in understanding the organization of each departmental and company-wide digital space.</p>
+            <div id="driveStructureContainer" class="space-y-3">
+            </div>
+            <div class="mt-6 p-4 bg-sky-50 border border-sky-200 rounded-md">
+                <h4 class="text-lg font-semibold text-sky-700 mb-2">Note on "Canva Files":</h4>
+                <p class="text-sm text-sky-600">Your "Canva Files" are likely working design files. It's recommended to keep source Canva files within Canva itself. When a design is finalized and approved, export it (e.g., as PNG, JPG, PDF) and save these final assets into the relevant departmental Shared Drive (e.g., `Marketing/Marketing Assets` or `Communications/Press Kits`). This keeps Google Drive focused on final deliverables. Alternatively, a dedicated folder for `Canva Exports` or `Design Assets` can be created within `Atolita - Company Hub/01_Brand Guidelines & Assets` or `Atolita - Marketing/Marketing Assets`.</p>
+            </div>
+        </section>
+
+        <section id="permissions" class="content-section bg-white p-6 rounded-lg shadow">
+            <h2 class="text-2xl font-semibold text-teal-700 mb-4">Access & Permissions Strategy</h2>
+            <p class="mb-6 text-stone-700">Effective permission management is crucial for data security and proper collaboration. Google Shared Drives offer robust controls. This section outlines the recommended approach to assigning access levels for Shared Drives, folders, and individual files.</p>
+
+            <h3 class="text-xl font-semibold text-teal-600 mb-3">1. Shared Drive Level Permissions</h3>
+            <p class="mb-4 text-stone-700">These roles are assigned at the highest level of a Shared Drive and determine overall access capabilities:</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="p-4 border border-stone-200 rounded-md bg-stone-50">
+                    <h4 class="font-semibold text-teal-700">Manager <span class="details-badge access-manager">Role</span></h4>
+                    <p class="text-sm text-stone-600">Can manage members, content, and settings of the Shared Drive. Typically for Department Heads or IT Admins.</p>
+                </div>
+                <div class="p-4 border border-stone-200 rounded-md bg-stone-50">
+                    <h4 class="font-semibold text-teal-700">Content Manager <span class="details-badge access-content-manager">Role</span></h4>
+                    <p class="text-sm text-stone-600">Can add, edit, move, and delete content. Suited for Team Leads or Senior Staff managing content.</p>
+                </div>
+                <div class="p-4 border border-stone-200 rounded-md bg-stone-50">
+                    <h4 class="font-semibold text-teal-700">Contributor <span class="details-badge access-contributor">Role</span></h4>
+                    <p class="text-sm text-stone-600">Can add and edit content. The standard role for most team members actively working within the drive.</p>
+                </div>
+                <div class="p-4 border border-stone-200 rounded-md bg-stone-50">
+                    <h4 class="font-semibold text-teal-700">Commenter <span class="details-badge access-commenter">Role</span></h4>
+                    <p class="text-sm text-stone-600">Can only comment on files. Useful for cross-functional collaborators needing to provide feedback.</p>
+                </div>
+                <div class="p-4 border border-stone-200 rounded-md bg-stone-50">
+                    <h4 class="font-semibold text-teal-700">Viewer <span class="details-badge access-viewer">Role</span></h4>
+                    <p class="text-sm text-stone-600">Can only view files. Appropriate for general company access to resources or for users who only need to read information.</p>
+                </div>
+            </div>
+            <p class="mb-4 text-stone-700"><strong>General Rule:</strong> Grant a team "Content Manager" or "Contributor" access to their own departmental Shared Drive. Grant "Viewer" or "Commenter" access to other relevant Shared Drives where they need visibility but not editing rights.</p>
+
+            <h3 class="text-xl font-semibold text-teal-600 mb-3">2. Folder Level Permissions (within Shared Drives)</h3>
+            <ul class="list-disc list-inside space-y-2 mb-4 text-stone-700">
+                <li><strong>Inheritance:</strong> Permissions are typically inherited from the parent Shared Drive or folder.</li>
+                <li><strong>Override:</strong> You can restrict permissions at the folder level. For example, a confidential sub-folder within a department's drive might have more limited access than the drive itself.</li>
+                <li><strong>External Sharing:</strong> When sharing with external parties, ALWAYS use the dedicated `Atolita - External Collaboration` Shared Drive. Share only specific folders or files within it, granting the minimum necessary permissions (e.g., Viewer, Commenter). Avoid sharing entire departmental Shared Drives externally.</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-teal-600 mb-3">3. Individual File Level Permissions</h3>
+            <ul class="list-disc list-inside space-y-2 text-stone-700">
+                <li>Use sparingly for one-off shares or specific document collaborations when folder-level permissions are not suitable.</li>
+                <li><strong>Expiration Dates:</strong> For external shares, always set an expiration date for access if the collaboration is temporary to maintain security.</li>
+            </ul>
+        </section>
+
+        <section id="workflow" class="content-section bg-white p-6 rounded-lg shadow">
+            <h2 class="text-2xl font-semibold text-teal-700 mb-4">Workflow Integration & Implementation</h2>
+            <p class="mb-6 text-stone-700">Adopting this new structure requires clear communication and consistent practices. This section covers key workflow integrations, naming conventions, and a step-by-step guide for implementation.</p>
+
+            <h3 class="text-xl font-semibold text-teal-600 mb-3">Workflow & Naming Conventions</h3>
+            <ul class="list-disc list-inside space-y-3 text-stone-700 mb-6">
+                <li>
+                    <strong>File Naming:</strong> Encourage consistent file naming for easy identification and searching. A good practice is:
+                    <code class="block bg-stone-100 p-2 rounded text-sm my-1">YYYYMMDD_ProjectName_DocumentTitle_Version.ext</code>
+                    (e.g., <code class="text-xs">20250521_Q2Campaign_MarketingPlan_V2.docx</code>)
+                </li>
+                <li>
+                    <strong>Folder Naming:</strong> Use clear, descriptive names for folders. Retain the numbering for top-level departmental drives (e.g., `01_Executive`, `02_Production`) as it aids in sorting and quick navigation.
+                </li>
+                <li>
+                    <strong>"My Drive" Usage:</strong> Encourage employees to use their personal "My Drive" only for:
+                    <ul class="list-circle list-inside ml-4 mt-1 space-y-1">
+                        <li>Truly personal, non-company-related files.</li>
+                        <li>Temporary working files or drafts that will eventually be moved to the appropriate Shared Drive once finalized or ready for collaboration. Company-owned work should reside in Shared Drives.</li>
+                    </ul>
+                </li>
+            </ul>
+            
+            <h3 class="text-xl font-semibold text-teal-600 mb-3">Implementation Steps</h3>
+            <p class="mb-4 text-stone-700">Follow these steps to roll out the new Google Drive structure effectively:</p>
+            <ol class="space-y-2">
+                <li class="implementation-step">
+                    <span class="checkbox-icon">1️⃣</span>
+                    <div>
+                        <h4 class="font-semibold">Audit Existing Content</h4>
+                        <p class="text-sm text-stone-600">Review your current "Team Drive" and individual "My Drives" for content that needs to be migrated. Identify owners for existing main folders/drives.</p>
+                    </div>
+                </li>
+                <li class="implementation-step">
+                    <span class="checkbox-icon">2️⃣</span>
+                    <div>
+                        <h4 class="font-semibold">Create New Shared Drives</h4>
+                        <p class="text-sm text-stone-600">As an administrator, create the new Shared Drives as outlined in the "Shared Drive Structure" section (e.g., `Atolita - Company Hub`, `Atolita - Production`).</p>
+                    </div>
+                </li>
+                <li class="implementation-step">
+                    <span class="checkbox-icon">3️⃣</span>
+                    <div>
+                        <h4 class="font-semibold">Migrate Content</h4>
+                        <p class="text-sm text-stone-600">Move files and folders into the appropriate new Shared Drives. Remember, ownership transfers to the Shared Drive. Start with less sensitive data and communicate clearly with your team during this process.</p>
+                    </div>
+                </li>
+                <li class="implementation-step">
+                    <span class="checkbox-icon">4️⃣</span>
+                    <div>
+                        <h4 class="font-semibold">Set Permissions</h4>
+                        <p class="text-sm text-stone-600">Add relevant team members to each Shared Drive with appropriate roles. Refine folder-level permissions for any sensitive sub-sections according to the principle of least privilege.</p>
+                    </div>
+                </li>
+                <li class="implementation-step">
+                    <span class="checkbox-icon">5️⃣</span>
+                    <div>
+                        <h4 class="font-semibold">Communicate & Train</h4>
+                        <p class="text-sm text-stone-600">Hold a team meeting to explain the new structure, its benefits, and usage guidelines. Provide a "Google Drive Best Practices" document.</p>
+                    </div>
+                </li>
+                <li class="implementation-step">
+                    <span class="checkbox-icon">6️⃣</span>
+                    <div>
+                        <h4 class="font-semibold">Monitor & Adjust</h4>
+                        <p class="text-sm text-stone-600">Regularly check for files saved in incorrect locations. Review permissions periodically (e.g., quarterly or with team changes) to ensure they remain appropriate.</p>
+                    </div>
+                </li>
+            </ol>
+             <div class="mt-8 p-4 bg-teal-50 border border-teal-200 rounded-md text-center">
+                <h3 class="text-xl font-semibold text-teal-700 mb-2">Conclusion</h3>
+                <p class="text-teal-600">By implementing this structured approach, Atolita will benefit from a more organized, secure, and efficient filing system. This will reduce confusion, prevent unauthorized access, and streamline collaboration both internally and externally.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center py-8 text-stone-600 text-sm">
+        <p>&copy; <span id="currentYear"></span> Atolita. Interactive Drive Organization Plan.</p>
+    </footer>
+
+    <script>
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const contentSections = document.querySelectorAll('.content-section');
+        const driveStructureContainer = document.getElementById('driveStructureContainer');
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        const sharedDrivesData = [
+            {
+                name: "Atolita - Company Hub",
+                purpose: "Central repository for company-wide information, policies, and resources.",
+                access: "Most users: Viewer. Managers: Editor/Content Manager for specific sub-sections.",
+                accessBadges: ['Viewer', 'Editor', 'Content Manager'],
+                subfolders: [
+                    "00_Company Policies & Procedures",
+                    "01_Brand Guidelines & Assets (Logos, fonts, general imagery)",
+                    "02_Internal Communications (Company-wide announcements, newsletters)",
+                    "03_General Resources (Software licenses, IT guides, general forms)",
+                    "04_About Atolita (Existing 'About Atolita' content)",
+                    "05_Templates (Existing 'Templates' folder)"
+                ]
+            },
+            {
+                name: "Atolita - Executive",
+                purpose: "Sensitive strategic documents, board meeting minutes, high-level planning.",
+                access: "Limited to Executive team members (Editor/Content Manager).",
+                accessBadges: ['Editor', 'Content Manager', 'Restricted'],
+                subfolders: [
+                    "Strategic Planning",
+                    "Board Meetings",
+                    "Confidential Reports",
+                    "Legal & Compliance (Executive View)"
+                ]
+            },
+            {
+                name: "Atolita - Production",
+                purpose: "All content related to the creation and delivery of Atolita's core products/services.",
+                access: "Production team: Editor/Content Manager. Relevant cross-functional teams: Viewer/Commenter.",
+                accessBadges: ['Editor', 'Content Manager', 'Viewer', 'Commenter'],
+                subfolders: [
+                    "Project Files (Sub-folders per project: Project X, Project Y)",
+                    "Development",
+                    "Quality Assurance",
+                    "Release Management"
+                ]
+            },
+            {
+                name: "Atolita - Marketing",
+                purpose: "Marketing strategies, campaigns, content creation, analytics.",
+                access: "Marketing team: Editor/Content Manager. Sales/Communications: Viewer.",
+                accessBadges: ['Editor', 'Content Manager', 'Viewer'],
+                subfolders: [
+                    "Campaigns (Sub-folders per campaign: Q1 Launch, Holiday Promo)",
+                    "Content Creation (Blogs, social media, video assets)",
+                    "Analytics & Reporting",
+                    "Marketing Assets (High-res images, videos, design files - consider linking to Canva for final assets)"
+                ]
+            },
+            {
+                name: "Atolita - Communications",
+                purpose: "Public relations, media kits, press releases, external messaging.",
+                access: "Communications team: Editor/Content Manager. Marketing/Executive: Viewer/Commenter.",
+                accessBadges: ['Editor', 'Content Manager', 'Viewer', 'Commenter'],
+                subfolders: [
+                    "Press Releases",
+                    "Media Kits",
+                    "Public Statements",
+                    "Crisis Communications"
+                ]
+            },
+            {
+                name: "Atolita - Sales & Community",
+                purpose: "Sales materials, client proposals, CRM integrations, community engagement.",
+                access: "Sales & Community team: Editor/Content Manager. Marketing: Viewer.",
+                accessBadges: ['Editor', 'Content Manager', 'Viewer'],
+                subfolders: [
+                    "Sales Collateral (Presentations, brochures)",
+                    "Client Proposals (Sub-folders per client)",
+                    "Community Initiatives",
+                    "CRM Data & Reports"
+                ]
+            },
+            {
+                name: "Atolita - Finance",
+                purpose: "Financial records, budgeting, invoicing, payroll.",
+                access: "Finance team: Editor/Content Manager. Executive: Viewer. Highly restricted.",
+                accessBadges: ['Editor', 'Content Manager', 'Viewer', 'Restricted'],
+                subfolders: [
+                    "Budgeting",
+                    "Invoices",
+                    "Payroll",
+                    "Financial Statements",
+                    "Tax Documents"
+                ]
+            },
+            {
+                name: "Atolita - Legal & Licensing",
+                purpose: "Contracts, legal documents, intellectual property, compliance.",
+                access: "Legal team: Editor/Content Manager. Executive: Viewer. Highly restricted.",
+                accessBadges: ['Editor', 'Content Manager', 'Viewer', 'Restricted'],
+                subfolders: [
+                    "Contracts (Sub-folders per type: Client, Vendor, Employee)",
+                    "Intellectual Property",
+                    "Compliance Documentation",
+                    "Legal Correspondence"
+                ]
+            },
+            {
+                name: "Atolita - Human Resources",
+                purpose: "Employee records, policies, recruitment, onboarding.",
+                access: "HR team: Editor/Content Manager. Executive: Viewer for high-level docs. Highly restricted.",
+                accessBadges: ['Editor', 'Content Manager', 'Viewer', 'Restricted'],
+                subfolders: [
+                    "Employee Files (Individual folders per employee - very restricted)",
+                    "Recruitment",
+                    "Onboarding & Offboarding",
+                    "HR Policies & Procedures",
+                    "Performance Management"
+                ]
+            },
+            {
+                name: "Atolita - Education",
+                purpose: "Training materials, learning resources, internal knowledge base.",
+                access: "Education team: Editor/Content Manager. All employees: Viewer.",
+                accessBadges: ['Editor', 'Content Manager', 'Viewer'],
+                subfolders: [
+                    "Employee Training",
+                    "Product Knowledge",
+                    "Skill Development",
+                    "Tutorials & Guides"
+                ]
+            },
+            {
+                name: "Atolita - Administration",
+                purpose: "Office management, vendor relations, general administrative tasks.",
+                access: "Admin team: Editor/Content Manager. Relevant employees: Viewer.",
+                accessBadges: ['Editor', 'Content Manager', 'Viewer'],
+                subfolders: [
+                    "Office Management",
+                    "Vendor Contracts",
+                    "Travel & Expenses",
+                    "General Correspondence"
+                ]
+            },
+            {
+                name: "Atolita - Website & Tech",
+                purpose: "Website content, technical documentation, IT resources, development files.",
+                access: "Tech team: Editor/Content Manager. Marketing/Communications: Viewer for website content.",
+                accessBadges: ['Editor', 'Content Manager', 'Viewer'],
+                subfolders: [
+                    "Website Content",
+                    "Technical Documentation",
+                    "IT Support Resources",
+                    "Development Files (Code repositories, staging environments)"
+                ]
+            },
+            {
+                name: "Atolita - Investments",
+                purpose: "Investment portfolios, financial models, due diligence documents.",
+                access: "Executive team, Finance team: Editor/Content Manager. Extremely restricted.",
+                accessBadges: ['Editor', 'Content Manager', 'Restricted'],
+                subfolders: [
+                    "Portfolio Management",
+                    "Due Diligence",
+                    "Investment Reports"
+                ]
+            },
+            {
+                name: "Atolita - External Collaboration",
+                purpose: "Dedicated, controlled space for sharing documents with external partners, clients, or vendors.",
+                access: "Internal owners: Editor/Content Manager. External collaborators: Viewer/Commenter/Editor ONLY for specific folders/files.",
+                accessBadges: ['Editor', 'Content Manager', 'Viewer', 'Commenter', 'Custom'],
+                subfolders: [
+                    "Client Projects (e.g., Client A - Project X)",
+                    "Vendor Agreements (e.g., Vendor B - Contract Docs)",
+                    "Partnerships (e.g., Partner C - Joint Initiatives)",
+                    "Important: Within each sub-folder, be very specific with permissions. For example, Client A - Project X might have Client A as a 'Commenter' or 'Editor' only on specific files within that folder, not the entire folder."
+                ]
+            }
+        ];
+
+        function getAccessBadgeClass(badgeText) {
+            const text = badgeText.toLowerCase();
+            if (text.includes('viewer')) return 'access-viewer';
+            if (text.includes('commenter')) return 'access-commenter';
+            if (text.includes('contributor')) return 'access-contributor';
+            if (text.includes('content manager')) return 'access-content-manager';
+            if (text.includes('editor')) return 'access-content-manager'; // Grouping editor with content manager for badge
+            if (text.includes('manager') && !text.includes('content')) return 'access-manager';
+            if (text.includes('restricted')) return 'access-restricted';
+            return 'access-custom';
+        }
+
+        sharedDrivesData.forEach(drive => {
+            const driveElement = document.createElement('div');
+            driveElement.className = 'drive-item border border-stone-200 rounded-lg shadow-sm';
+
+            const driveHeader = document.createElement('button');
+            driveHeader.className = 'w-full text-left p-4 bg-stone-50 hover:bg-teal-50 rounded-t-lg focus:outline-none';
+            driveHeader.innerHTML = `<h3 class="text-lg font-semibold text-teal-700 flex justify-between items-center">
+                                        ${drive.name}
+                                        <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                     </h3>`;
+            
+            const driveDetails = document.createElement('div');
+            driveDetails.className = 'drive-details p-4 border-t border-stone-200 bg-white rounded-b-lg';
+            
+            let accessBadgesHTML = '';
+            if (drive.accessBadges) {
+                drive.accessBadges.forEach(badge => {
+                    accessBadgesHTML += `<span class="details-badge ${getAccessBadgeClass(badge)}">${badge}</span>`;
+                });
+            }
+
+            driveDetails.innerHTML = `
+                <div class="mb-3">
+                    <strong class="block text-sm font-medium text-stone-700">Purpose:</strong>
+                    <p class="text-sm text-stone-600">${drive.purpose}</p>
+                </div>
+                <div class="mb-3">
+                    <strong class="block text-sm font-medium text-stone-700">Recommended Access:</strong>
+                    <p class="text-sm text-stone-600 mb-1">${drive.access}</p>
+                    <div>${accessBadgesHTML}</div>
+                </div>
+                <div>
+                    <strong class="block text-sm font-medium text-stone-700">Suggested Sub-folders:</strong>
+                    <ul class="list-disc list-inside ml-1 space-y-1 text-sm text-stone-600 subfolder-list">
+                        ${drive.subfolders.map(sf => `<li>${sf}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+
+            driveHeader.addEventListener('click', () => {
+                const currentlyOpen = document.querySelector('.drive-details[style*="display: block"]');
+                const icon = driveHeader.querySelector('svg');
+                if (currentlyOpen && currentlyOpen !== driveDetails) {
+                    currentlyOpen.style.display = 'none';
+                    const otherIcon = currentlyOpen.previousElementSibling.querySelector('svg');
+                    if(otherIcon) otherIcon.classList.remove('rotate-180');
+                }
+                driveDetails.style.display = driveDetails.style.display === 'block' ? 'none' : 'block';
+                icon.classList.toggle('rotate-180');
+            });
+
+            driveElement.appendChild(driveHeader);
+            driveElement.appendChild(driveDetails);
+            driveStructureContainer.appendChild(driveElement);
+        });
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.dataset.tab;
+
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('tab-active');
+                    btn.classList.add('tab-inactive');
+                });
+                button.classList.add('tab-active');
+                button.classList.remove('tab-inactive');
+
+                contentSections.forEach(section => {
+                    if (section.id === targetTab) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+                 window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
